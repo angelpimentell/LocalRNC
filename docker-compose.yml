@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   app:
     build: 
@@ -16,21 +14,16 @@ services:
       - app_network
 
   db:
-    image: postgres:latest
-    container_name: postgres-db
+    image: postgres:15
     environment:
       POSTGRES_DB: localrnc
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: admin
     ports:
-      - "5432:5432"
+      - "5438:5432"
     networks:
       - app_network
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
 
 networks:
   app_network:
 
-volumes:
-  postgres_data:

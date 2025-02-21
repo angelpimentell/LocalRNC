@@ -8,11 +8,11 @@ namespace LocalRNC.Models
         public int Id { get; set; }
 
         [Required]
-        [StringLength(100)]
+        [StringLength(255)]
         public required string Name { get; set; }
 
         [Required]
-        [StringLength(20)]
+        [StringLength(11)]
         public required string RNC { get; set; }
 
         [StringLength(500)]
