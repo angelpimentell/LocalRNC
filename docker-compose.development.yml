@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  # app:
+  #   build: 
+  #     context: .
+  #     dockerfile: ./LocalRNC/Dockerfile
+  #   depends_on:
+  #     - db
+  #   environment:
+  #     - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=localrnc;Username=postgres;Password=admin
+  #   ports:
+  #     - "5001:8081"
+  #     - "5000:8080"
+  #   networks:
+  #     - app_network
+
+  db:
+    image: postgres:latest
+    container_name: postgres-db
+    environment:
+      POSTGRES_DB: localrnc
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+    ports:
+      - "5432:5432"
+    networks:
+      - app_network
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+networks:
+  app_network:
+
+volumes:
+  postgres_data:
