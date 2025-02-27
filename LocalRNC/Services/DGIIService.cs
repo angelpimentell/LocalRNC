@@ -1,15 +1,26 @@
 ﻿namespace LocalRNC.Services
 {
-    public class DGIIService(HttpClient httpClient, ILogger<DGIIService> logger)
+    public class DGIIService
     {
-        private readonly HttpClient _httpClient = httpClient;
-        private readonly ILogger<DGIIService> _logger = logger;
+        private readonly HttpClient _httpClient;
+        private readonly ILogger<DGIIService> _logger;
+
+        public DGIIService()
+        {
+            this._httpClient = new HttpClient();
+            this._logger = LoggerFactory.Create(builder => builder.AddConsole()).CreateLogger<DGIIService>();
+        }
+
+        private static bool ExistsDgiiFileValid()
+        {
+            return true;
+        }
 
         public async Task DownloadFileAsync(string filePath)
         {
             const string url = "https://www.dgii.gov.do/app/WebApps/Consultas/RNC/DGII_RNC.zip";
 
-            try
+            if (ExistsDgiiFileValid())
             {
                 _logger.LogInformation("Downlading file from DGII");
 
@@ -21,10 +32,7 @@
 
                 _logger.LogInformation("File downloaded");
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error downlading file");
-            }
+
         }
 
     }
