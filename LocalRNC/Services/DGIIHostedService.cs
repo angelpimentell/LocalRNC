@@ -20,7 +20,8 @@
 
             _logger.LogInformation("Timed Hosted Service is working. Count");
             var dgiiService = new DGIIService();
-            await dgiiService.DownloadFileAsync(filePath: "");
+            await dgiiService.DownloadFileAsync();
+            dgiiService.UpdateDB();
         }
 
         public Task StopAsync(CancellationToken stoppingToken)
