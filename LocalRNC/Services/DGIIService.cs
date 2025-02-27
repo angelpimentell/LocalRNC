@@ -6,7 +6,7 @@ namespace LocalRNC.Services
     {
         private readonly HttpClient _httpClient;
         private readonly ILogger<DGIIService> _logger;
-        private readonly string _filePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads");
+        private readonly string _basePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads");
         private readonly string _zipFilePath;
         private readonly string _extractedPath;
         private readonly string _rncPath;
@@ -16,8 +16,8 @@ namespace LocalRNC.Services
             this._httpClient = new HttpClient();
             this._logger = LoggerFactory.Create(builder => builder.AddConsole()).CreateLogger<DGIIService>();
 
-            this._zipFilePath = this._filePath + "\\rnc.zip";
-            this._extractedPath = this._filePath + "\\rnc_extracted";
+            this._zipFilePath = this._basePath + "\\rnc.zip";
+            this._extractedPath = this._basePath + "\\rnc_extracted";
             this._rncPath = this._extractedPath + "\\TMP\\DGII_RNC.txt";
         }
 
