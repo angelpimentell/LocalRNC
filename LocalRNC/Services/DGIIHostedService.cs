@@ -1,8 +1,9 @@
 ﻿namespace LocalRNC.Services
 {
-    public class DGIIHostedService(ILogger<DGIIHostedService> logger) : IHostedService, IDisposable
+    public class DGIIHostedService(ILogger<DGIIHostedService> logger, IServiceProvider serviceProvider) : IHostedService, IDisposable
     {
         private readonly ILogger<DGIIHostedService> _logger = logger;
+        private readonly IServiceProvider _serviceProvider = serviceProvider;
         private Timer? _timer = null;
 
         public Task StartAsync(CancellationToken stoppingToken)
@@ -19,9 +20,16 @@
         {
 
             _logger.LogInformation("Timed Hosted Service is working. Count");
-            var dgiiService = new DGIIService();
-            await dgiiService.DownloadFileAsync();
-            dgiiService.UpdateDB();
+
+            // Create a scope to resolve DGIIService as scoped
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var dgiiService = scope.ServiceProvider.GetRequiredService<DGIIService>();
+
+                // Call methods of DGIIService
+                await dgiiService.DownloadFileAsync();
+                dgiiService.UpdateDB();
+            }
         }
 
         public Task StopAsync(CancellationToken stoppingToken)

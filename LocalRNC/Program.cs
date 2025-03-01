@@ -16,8 +16,12 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString));
 
+builder.Services.AddTransient<DGIIService>();
+
 // Configure background hosted services
 builder.Services.AddHostedService<DGIIHostedService>();
+
+
 
 var app = builder.Build();
 

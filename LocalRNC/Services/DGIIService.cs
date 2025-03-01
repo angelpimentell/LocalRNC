@@ -1,4 +1,5 @@
-﻿using System.IO.Compression;
+﻿using LocalRNC.Data;
+using System.IO.Compression;
 
 namespace LocalRNC.Services
 {
@@ -10,8 +11,9 @@ namespace LocalRNC.Services
         private readonly string _zipFilePath;
         private readonly string _extractedPath;
         private readonly string _rncPath;
+        private readonly ApplicationDbContext _dbContext;   
 
-        public DGIIService()
+        public DGIIService(ApplicationDbContext dbContext)
         {
             this._httpClient = new HttpClient();
             this._logger = LoggerFactory.Create(builder => builder.AddConsole()).CreateLogger<DGIIService>();
@@ -19,6 +21,7 @@ namespace LocalRNC.Services
             this._zipFilePath = this._basePath + "\\rnc.zip";
             this._extractedPath = this._basePath + "\\rnc_extracted";
             this._rncPath = this._extractedPath + "\\TMP\\DGII_RNC.txt";
+            this._dbContext = dbContext;
         }
 
         private bool ExistsDgiiFileValid()
