@@ -1,4 +1,6 @@
 ﻿using LocalRNC.Data;
+using LocalRNC.Models;
+using Microsoft.EntityFrameworkCore;
 using System.IO.Compression;
 
 namespace LocalRNC.Services
@@ -53,7 +55,7 @@ namespace LocalRNC.Services
 
         }
 
-        public void UpdateDB()
+        public async void UpdateDB()
         {
             _logger.LogInformation("Unziping file");
             ZipFile.ExtractToDirectory(this._zipFilePath, this._extractedPath);
@@ -64,7 +66,33 @@ namespace LocalRNC.Services
 
             foreach (var line in lines)
             {
-                Console.WriteLine(line);
+                string[] data = line.Split('|');
+                string rnc = data[0];
+                string name = data[1];
+                string description = data[3];
+
+                var connectionString = _dbContext.Database.GetDbConnection().ConnectionString;
+
+                var company = await _dbContext.companies.FirstOrDefaultAsync(r => r.RNC == rnc);
+
+                if (company != null)
+                {
+                    company.Name = name;
+                    company.Description = description;
+                }
+                else
+                {
+                    var newCompany = new Company
+                    {
+                        RNC = rnc,
+                        Name = name,
+                        Description = description,
+                        Created_at = DateTime.Now
+                    };
+                    await this._dbContext.companies.AddAsync(newCompany);
+                }
+
+                await this._dbContext.SaveChangesAsync();
             }
 
 
