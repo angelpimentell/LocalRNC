@@ -12,7 +12,7 @@ namespace LocalRNC.Migrations
         {
             migrationBuilder.AlterColumn<DateTime>(
                 name: "Created_at",
-                table: "YourTableName", // Replace with your actual table name
+                table: "companies", // Replace with your actual table name
                 type: "timestamp with time zone", // Keep the same type
                 nullable: false,
                 defaultValue: DateTime.UtcNow, // Sets the default to the current timestamp
@@ -26,7 +26,7 @@ namespace LocalRNC.Migrations
         {
             migrationBuilder.AlterColumn<DateTime>(
                 name: "Created_at",
-                table: "YourTableName", // Replace with your actual table name
+                table: "companies", // Replace with your actual table name
                 type: "timestamp with time zone",
                 nullable: false,
                 oldClrType: typeof(DateTime),
