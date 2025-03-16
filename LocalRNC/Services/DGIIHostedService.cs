@@ -28,7 +28,7 @@
 
                 // Call methods of DGIIService
                 await dgiiService.DownloadFileAsync();
-                dgiiService.UpdateDB();
+                await dgiiService.UpdateDB();
             }
         }
 

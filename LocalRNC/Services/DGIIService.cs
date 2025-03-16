@@ -17,13 +17,13 @@ namespace LocalRNC.Services
 
         public DGIIService(ApplicationDbContext dbContext)
         {
-            this._httpClient = new HttpClient();
-            this._logger = LoggerFactory.Create(builder => builder.AddConsole()).CreateLogger<DGIIService>();
+            _httpClient = new HttpClient();
+            _logger = LoggerFactory.Create(builder => builder.AddConsole()).CreateLogger<DGIIService>();
 
-            this._zipFilePath = this._basePath + "\\rnc.zip";
-            this._extractedPath = this._basePath + "\\rnc_extracted";
-            this._rncPath = this._extractedPath + "\\TMP\\DGII_RNC.txt";
-            this._dbContext = dbContext;
+            _zipFilePath = _basePath + "\\rnc.zip";
+            _extractedPath = _basePath + "\\rnc_extracted";
+            _rncPath = _extractedPath + "\\TMP\\DGII_RNC.txt";
+            _dbContext = dbContext;
         }
 
         private bool ExistsDgiiFileValid()
@@ -55,7 +55,7 @@ namespace LocalRNC.Services
 
         }
 
-        public async void UpdateDB()
+        public async Task UpdateDB()
         {
             _logger.LogInformation("Unziping file");
             ZipFile.ExtractToDirectory(this._zipFilePath, this._extractedPath);
@@ -71,8 +71,6 @@ namespace LocalRNC.Services
                 string name = data[1];
                 string description = data[3];
 
-                var connectionString = _dbContext.Database.GetDbConnection().ConnectionString;
-
                 var company = await _dbContext.companies.FirstOrDefaultAsync(r => r.RNC == rnc);
 
                 if (company != null)
@@ -87,12 +85,12 @@ namespace LocalRNC.Services
                         RNC = rnc,
                         Name = name,
                         Description = description,
-                        Created_at = DateTime.Now
+                        Created_at = DateTime.UtcNow
                     };
-                    await this._dbContext.companies.AddAsync(newCompany);
+                    await _dbContext.companies.AddAsync(newCompany);
                 }
 
-                await this._dbContext.SaveChangesAsync();
+                await _dbContext.SaveChangesAsync();
             }
 
 
