@@ -3,6 +3,7 @@ using LocalRNC.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -59,14 +60,38 @@ namespace LocalRNC.Controllers
 
         // PUT api/<CompanyController>/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody]string value)
+        public async Task<ActionResult<Company>> Put(int id, [FromBody] Company company)
         {
+            var existingCompany = await _context.companies.FindAsync(id);
+
+            if (existingCompany == null)
+            {
+                return NotFound();
+            }
+
+            _context.Entry(company).State = EntityState.Modified;
+
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+
         }
 
         // DELETE api/<CompanyController>/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public async Task<ActionResult<Company>> Delete(int id)
         {
+            var company = await _context.companies.FindAsync(id);
+
+            if (company == null)
+            {
+                return NotFound();
+            }
+
+            _context.companies.Remove(company);
+
+            await _context.SaveChangesAsync();
+            return NoContent();
         }
     }
 }
