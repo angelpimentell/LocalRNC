@@ -9,10 +9,10 @@ namespace LocalRNC.Services
     {
         private readonly HttpClient _httpClient;
         private readonly ILogger<DGIIService> _logger;
-        private readonly string _basePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads");
-        private readonly string _zipFilePath;
-        private readonly string _extractedPath;
-        private readonly string _rncPath;
+        private readonly string _basePath;
+        private readonly string _rncZipPath;
+        private readonly string _rncFolderPath;
+        private readonly string _rncTxtPath;
         private readonly ApplicationDbContext _dbContext;   
 
         public DGIIService(ApplicationDbContext dbContext)
@@ -20,15 +20,16 @@ namespace LocalRNC.Services
             _httpClient = new HttpClient();
             _logger = LoggerFactory.Create(builder => builder.AddConsole()).CreateLogger<DGIIService>();
 
-            _zipFilePath = _basePath + "\\rnc.zip";
-            _extractedPath = _basePath + "\\rnc_extracted";
-            _rncPath = _extractedPath + "\\TMP\\DGII_RNC.txt";
+            _basePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads");
+            _rncZipPath = _basePath + "\\rnc.zip";
+            _rncFolderPath = _basePath + "\\rnc_extracted";
+            _rncTxtPath = _rncFolderPath + "\\TMP\\DGII_RNC.txt";
             _dbContext = dbContext;
         }
 
         private bool ExistsDgiiFileValid()
         {
-            if (File.Exists(this._zipFilePath))
+            if (File.Exists(_rncZipPath))
             {
                 return true;
             }
@@ -48,7 +49,7 @@ namespace LocalRNC.Services
                 response.EnsureSuccessStatusCode();
 
                 var fileBytes = await response.Content.ReadAsByteArrayAsync();
-                await File.WriteAllBytesAsync(this._zipFilePath, fileBytes);
+                await File.WriteAllBytesAsync(_rncZipPath, fileBytes);
 
                 _logger.LogInformation("File downloaded");
             }
@@ -58,10 +59,16 @@ namespace LocalRNC.Services
         public async Task UpdateDB()
         {
             _logger.LogInformation("Unziping file");
-            ZipFile.ExtractToDirectory(this._zipFilePath, this._extractedPath);
+
+            if (Directory.Exists(_rncFolderPath))
+            {
+                Directory.Delete(_rncFolderPath, true);
+            }
+
+            ZipFile.ExtractToDirectory( _rncZipPath, _rncFolderPath);
             _logger.LogInformation("Unziped file");
 
-            string[] lines = File.ReadAllLines(this._rncPath);
+            string[] lines = File.ReadAllLines(_rncTxtPath);
             _logger.LogInformation("File contents (line by line):");
 
             foreach (var line in lines)
@@ -92,8 +99,6 @@ namespace LocalRNC.Services
 
                 await _dbContext.SaveChangesAsync();
             }
-
-
         }
 
     }
