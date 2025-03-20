@@ -10,5 +10,14 @@ namespace LocalRNC.Data
         public DbSet<Company> companies { get; set; }
         public DbSet<User> users { get; set; }
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<User>().HasData(
+                new User {Id = 1, Email = "admin@admin.com", Password = "admin", IsAdmin = true, CreatedAt = new DateTime(2025, 3, 20) }
+            );
+        }
+
     }
 }
