@@ -8,6 +8,7 @@ namespace LocalRNC.Data
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
         public DbSet<Company> companies { get; set; }
+        public DbSet<User> users { get; set; }
 
     }
 }
