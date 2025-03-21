@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using LocalRNC.Data;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -11,22 +13,26 @@ namespace LocalRNC.Controllers
     public class LoginController : ControllerBase
     {
         private readonly IConfiguration _config;
+        private readonly ApplicationDbContext _context;
 
-        public LoginController(IConfiguration config)
+        public LoginController(ApplicationDbContext context, IConfiguration config)
         {
             _config = config;
+            _context = context;
         }
 
         [HttpPost("login")]
-        public IActionResult Login([FromQuery] string username, [FromQuery] string password)
+        public IActionResult Login([FromQuery] string email, [FromQuery] string password)
         {
-            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
+            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
             {
-                return BadRequest(new { Message = "Username and password are required." });
+                return BadRequest(new { Message = "Email and password are required." });
             }
 
-            // Replace with real authentication logic
-            if (username == "admin" && password == "password")
+            var user = _context.users.FirstOrDefault(u => u.Email == email);
+            var verificationResult = new PasswordHasher<object>().VerifyHashedPassword(null, user.Password, password);
+
+            if (verificationResult == PasswordVerificationResult.Success)
             {
                 var tokenString = GenerateJWT();
                 return Ok(new { Token = tokenString });
