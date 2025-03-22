@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
+using LocalRNC;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -25,7 +26,7 @@ namespace LocalRNC.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Company>>> Get()
         {
-            return await _context.companies.ToListAsync();
+            return await _context.companies.Take(Constant.PAGINATION_SIZE).ToListAsync();
         }
 
         // GET api/<CompanyController>/5
