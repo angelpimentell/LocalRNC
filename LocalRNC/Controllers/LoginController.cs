@@ -1,4 +1,5 @@
 ﻿using LocalRNC.Data;
+using LocalRNC.Request;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -22,8 +23,11 @@ namespace LocalRNC.Controllers
         }
 
         [HttpPost("login")]
-        public IActionResult Login([FromQuery] string email, [FromQuery] string password)
+        public IActionResult Login([FromBody] LoginRequest request)
         {
+            string email = request.Email;
+            string password = request.Password;
+
             if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
             {
                 return BadRequest(new { Message = "Email and password are required." });
