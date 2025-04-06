@@ -10,7 +10,8 @@ namespace LocalRNC.Tests
     [TestClass]
     public sealed class CompanyControllerUnitTest
     {
-        private ApplicationDbContext GetInMemoryDbContext()
+        public ApplicationDbContext _context;
+        public CompanyControllerUnitTest()
         {
             var options = new DbContextOptionsBuilder<ApplicationDbContext>()
                 .UseInMemoryDatabase(databaseName: "TestDb")
@@ -21,15 +22,15 @@ namespace LocalRNC.Tests
             context.companies.Add(new Company { Name = "Company2", RNC = "130403898", Created_at = DateTime.UtcNow });
             context.SaveChanges();
 
-            return context;
+            _context = context;
         }
+
 
         [TestMethod]
         public async Task GetCompanyById_ReturnsCompany_WhenExists()
         {
             // Arrange
-            var context = GetInMemoryDbContext();
-            var controller = new CompanyController(context);
+            var controller = new CompanyController(_context);
 
             // Act
             var result = await controller.Get(1);
@@ -49,17 +50,13 @@ namespace LocalRNC.Tests
         public async Task GetAllCompanies_ReturnsCompanies_WhenExist()
         {
             // Arrange
-            var context = GetInMemoryDbContext();
-            var controller = new CompanyController(context);
+            var controller = new CompanyController(_context);
 
             // Act
             var result = await controller.Get();  // The method returns ActionResult<IEnumerable<Company>>
 
             // Assert
-            var type = result.Result.GetType();
-            var okResult = result.Result as OkObjectResult;
-            Assert.IsNotNull(okResult);
-            var companies = okResult.Value as List<Company>;
+            var companies = result.Value as List<Company>;
             Assert.IsNotNull(companies);
             Assert.AreEqual(2, companies.Count);  // We added two companies in memory
             Assert.AreEqual("Company1", companies[0].Name);
