@@ -14,15 +14,17 @@ namespace LocalRNC.Tests
         public CompanyControllerUnitTest()
         {
             var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-                .UseInMemoryDatabase(databaseName: "TestDb")
+                .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
                 .Options;
 
-            var context = new ApplicationDbContext(options);
-            context.companies.Add(new Company { Name = "Company1", RNC = "130403899", Created_at = DateTime.UtcNow });
-            context.companies.Add(new Company { Name = "Company2", RNC = "130403898", Created_at = DateTime.UtcNow });
-            context.SaveChanges();
+            _context = new ApplicationDbContext(options);
 
-            _context = context;
+            _context.companies.AddRange(
+                new Company { Name = "Company1", RNC = "130403899", Created_at = DateTime.UtcNow },
+                new Company { Name = "Company2", RNC = "130403898", Created_at = DateTime.UtcNow }
+            );
+
+            _context.SaveChanges();
         }
 
 
@@ -53,12 +55,12 @@ namespace LocalRNC.Tests
             var controller = new CompanyController(_context);
 
             // Act
-            var result = await controller.Get();  // The method returns ActionResult<IEnumerable<Company>>
+            var result = await controller.Get();
 
             // Assert
             var companies = result.Value as List<Company>;
             Assert.IsNotNull(companies);
-            Assert.AreEqual(2, companies.Count);  // We added two companies in memory
+            Assert.AreEqual(2, companies.Count);
             Assert.AreEqual("Company1", companies[0].Name);
             Assert.AreEqual("Company2", companies[1].Name);
         }
