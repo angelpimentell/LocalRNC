@@ -29,7 +29,7 @@ namespace LocalRNC.Tests
 
 
         [TestMethod]
-        public async Task GetCompanyById_ReturnsCompany_WhenExists()
+        public async Task GetCompany_ReturnsCompanyById_WhenExists()
         {
             // Arrange
             var controller = new CompanyController(_context);
@@ -49,7 +49,7 @@ namespace LocalRNC.Tests
         }
 
         [TestMethod]
-        public async Task GetAllCompanies_ReturnsCompanies_WhenExist()
+        public async Task GetCompany_ReturnsAllCompanies_WhenExist()
         {
             // Arrange
             var controller = new CompanyController(_context);
@@ -63,6 +63,69 @@ namespace LocalRNC.Tests
             Assert.AreEqual(2, companies.Count);
             Assert.AreEqual("Company1", companies[0].Name);
             Assert.AreEqual("Company2", companies[1].Name);
+        }
+
+        [TestMethod]
+        public async Task CreateCompany_AddCompanyToDatabase()
+        {
+            // Arrange
+            var controller = new CompanyController(_context);
+            var newCompany = new Company
+            {
+                Name = "New Company",
+                RNC = "130403897",
+                Created_at = DateTime.UtcNow
+            };
+
+            // Act
+            var result = await controller.Post(newCompany);
+
+            // Assert
+            var createdResult = result.Result as CreatedAtActionResult;
+            Assert.IsNotNull(createdResult);
+
+            var company = createdResult.Value as Company;
+            Assert.IsNotNull(company);
+            Assert.AreEqual("New Company", company.Name);
+            Assert.AreEqual("130403897", company.RNC);
+
+            var dbCompany = await _context.companies.FindAsync(company.Id);
+            Assert.IsNotNull(dbCompany);
+        }
+
+        [TestMethod]
+        public async Task UpdateCompany_UpdatesExistingCompany()
+        {
+            // Arrange
+            var controller = new CompanyController(_context);
+            var companyToUpdate = await _context.companies.FirstAsync();
+            companyToUpdate.Name = "Updated Company";
+
+            // Act
+            var result = await controller.Put(companyToUpdate.Id, companyToUpdate);
+
+            // Assert
+            Assert.IsInstanceOfType(result.Result, typeof(NoContentResult));
+
+            var updatedCompany = await _context.companies.FindAsync(companyToUpdate.Id);
+            Assert.AreEqual("Updated Company", updatedCompany.Name);
+        }
+
+        [TestMethod]
+        public async Task DeleteCompany_RemovesCompanyFromDatabase()
+        {
+            // Arrange
+            var controller = new CompanyController(_context);
+            var companyIdToDelete = 1;
+
+            // Act
+            var result = await controller.Delete(companyIdToDelete);
+
+            // Assert
+            Assert.IsInstanceOfType(result.Result, typeof(NoContentResult));
+
+            var deletedCompany = await _context.companies.FindAsync(companyIdToDelete);
+            Assert.IsNull(deletedCompany);
         }
     }
 }
