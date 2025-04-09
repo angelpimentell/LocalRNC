@@ -1,0 +1,29 @@
+services:
+  app:
+    build: 
+      context: .
+      dockerfile: ./LocalRNC/Dockerfile
+    depends_on:
+      - db
+    environment:
+      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=localrnc;Username=postgres;Password=admin
+    ports:
+      - "5001:8081"
+      - "5000:8080"
+    networks:
+      - app_network
+
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: localrnc
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+    ports:
+      - "5438:5432"
+    networks:
+      - app_network
+
+networks:
+  app_network:
+
