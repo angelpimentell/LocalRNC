@@ -14,6 +14,7 @@ namespace LocalRNC.Services
         private readonly string _rncFolderPath;
         private readonly string _rncTxtPath;
         private readonly ApplicationDbContext _dbContext;   
+        private readonly char sep = Path.DirectorySeparatorChar;
 
         public DGIIService(ApplicationDbContext dbContext)
         {
@@ -21,9 +22,9 @@ namespace LocalRNC.Services
             _logger = LoggerFactory.Create(builder => builder.AddConsole()).CreateLogger<DGIIService>();
 
             _basePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads");
-            _rncZipPath = _basePath + "\\rnc.zip";
-            _rncFolderPath = _basePath + "\\rnc_extracted";
-            _rncTxtPath = _rncFolderPath + "\\TMP\\DGII_RNC.txt";
+            _rncZipPath = _basePath + $"{sep}rnc.zip";
+            _rncFolderPath = _basePath + $"{sep}rnc_extracted";
+            _rncTxtPath = _rncFolderPath + $"{sep}TMP{sep}DGII_RNC.txt";
             _dbContext = dbContext;
         }
 
