@@ -25,6 +25,9 @@ namespace LocalRNC.Services
             _rncZipPath = _basePath + $"{sep}rnc.zip";
             _rncFolderPath = _basePath + $"{sep}rnc_extracted";
             _rncTxtPath = _rncFolderPath + $"{sep}TMP{sep}DGII_RNC.txt";
+
+            Directory.CreateDirectory(_basePath);
+
             _dbContext = dbContext;
         }
 
@@ -40,6 +43,11 @@ namespace LocalRNC.Services
 
         public async Task DownloadFileAsync()
         {
+            if (Directory.Exists(_rncFolderPath))
+            {
+                Directory.Delete(_rncFolderPath, true);
+            }
+
             const string url = "https://www.dgii.gov.do/app/WebApps/Consultas/RNC/DGII_RNC.zip";
 
             if (!ExistsDgiiFileValid())
@@ -61,15 +69,10 @@ namespace LocalRNC.Services
         {
             _logger.LogInformation("Unziping file");
 
-            if (Directory.Exists(_rncFolderPath))
-            {
-                Directory.Delete(_rncFolderPath, true);
-            }
-
             ZipFile.ExtractToDirectory( _rncZipPath, _rncFolderPath);
             _logger.LogInformation("Unziped file");
 
-            string[] lines = File.ReadAllLines(_rncTxtPath);
+            string[] lines = []; // File.ReadAllLines(_rncTxtPath);
             _logger.LogInformation("File contents (line by line):");
 
             foreach (var line in lines)
